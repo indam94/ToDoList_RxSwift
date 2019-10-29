@@ -17,14 +17,17 @@ class TaskViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     let disposeBag = DisposeBag()
     
+    private var tasks = Variable<[Task]>([])
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.navigationController?.navigationBar.prefersLargeTitles = true
+        
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return self.tasks.value.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -43,6 +46,7 @@ class TaskViewController: UIViewController, UITableViewDelegate, UITableViewData
         addTVC.taskSubjectObserable.subscribe(onNext: {task in
             
             print(task)
+            self.tasks.value.append(task)
             
             }).disposed(by: disposeBag)
     }
