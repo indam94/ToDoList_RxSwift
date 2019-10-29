@@ -8,11 +8,14 @@
 
 import Foundation
 import UIKit
+import RxSwift
 
 class TaskViewController: UIViewController, UITableViewDelegate, UITableViewDataSource{
     
     @IBOutlet weak var prioritySegmentControl: UISegmentedControl!
     @IBOutlet weak var toboTableView: UITableView!
+    
+    let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,6 +33,19 @@ class TaskViewController: UIViewController, UITableViewDelegate, UITableViewData
         return cell
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        guard let navC = segue.destination as? UINavigationController,
+            let addTVC = navC.viewControllers.first as? AddTaskViewController else{
+                fatalError("Controller Not Found")
+        }
+        
+        addTVC.taskSubjectObserable.subscribe(onNext: {task in
+            
+            print(task)
+            
+            }).disposed(by: disposeBag)
+    }
     
 
     
