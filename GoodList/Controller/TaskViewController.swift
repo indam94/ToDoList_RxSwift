@@ -12,8 +12,13 @@ import UIKit
 class TaskViewController: UIViewController, UITableViewDelegate, UITableViewDataSource{
     
     @IBOutlet weak var prioritySegmentControl: UISegmentedControl!
-    
     @IBOutlet weak var toboTableView: UITableView!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationController?.navigationBar.prefersLargeTitles = true
+    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 10
