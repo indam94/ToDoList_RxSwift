@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import RxSwift
+import RxCocoa
 
 class TaskViewController: UIViewController, UITableViewDelegate, UITableViewDataSource{
     
@@ -17,7 +18,8 @@ class TaskViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     let disposeBag = DisposeBag()
     
-    private var tasks = Variable<[Task]>([])
+//    private var tasks = Variable<[Task]>([])
+    private var tasks = BehaviorRelay<[Task]>(value: [])
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,6 +35,8 @@ class TaskViewController: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskTableViewCell", for: indexPath)
         
+        //cell.textLabel.text = self.tasks.value
+        
         return cell
     }
     
@@ -46,7 +50,12 @@ class TaskViewController: UIViewController, UITableViewDelegate, UITableViewData
         addTVC.taskSubjectObserable.subscribe(onNext: {task in
             
             print(task)
-            self.tasks.value.append(task)
+            
+            let priority = Priority(rawValue: self.prioritySegmentControl.selectedSegmentIndex - 1)
+            
+            var existingTasks = self.tasks.value
+            existingTasks.append(task)
+            self.tasks.accept(existingTasks)
             
             }).disposed(by: disposeBag)
     }
