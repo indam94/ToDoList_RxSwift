@@ -20,6 +20,7 @@ class TaskViewController: UIViewController, UITableViewDelegate, UITableViewData
     
 //    private var tasks = Variable<[Task]>([])
     private var tasks = BehaviorRelay<[Task]>(value: [])
+    private var filteredTasks = [Task]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,7 +48,7 @@ class TaskViewController: UIViewController, UITableViewDelegate, UITableViewData
                 fatalError("Controller Not Found")
         }
         
-        addTVC.taskSubjectObserable.subscribe(onNext: {task in
+        addTVC.taskSubjectObserable.subscribe(onNext: { [unowned self] task in
             
             print(task)
             
@@ -57,9 +58,32 @@ class TaskViewController: UIViewController, UITableViewDelegate, UITableViewData
             existingTasks.append(task)
             self.tasks.accept(existingTasks)
             
+            self.filterTasks(by: priority)
+            
             }).disposed(by: disposeBag)
     }
     
+    private func filterTasks(by priority: Priority?){
+        
+        if priority == nil {
+            self.filteredTasks = self.tasks.value
+        }
+        else{
+            self.tasks.map{ tasks in
+                return tasks.filter{ $0.priority == priority! }
+            }.subscribe(onNext: { [weak self] tasks in
+                self?.filteredTasks = tasks
+                print(tasks)
+            }).disposed(by: disposeBag)
+        }
+        
+    }
 
+    @IBAction func priorityValueChanged(_ sender: UISegmentedControl) {
+        
+        let priority = Priority(rawValue: sender.selectedSegmentIndex - 1)
+        
+        filterTasks(by: priority)
+    }
     
 }
